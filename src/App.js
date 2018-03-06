@@ -60,8 +60,9 @@ class BookList extends React.Component{
   }
 }
 class BookMain extends React.Component{
-  state = {
-    bookList: [
+  constructor(props){
+    super(props);
+    this.bookList= [
       {
         url:'url("http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api")',
         states:'reading',
@@ -111,60 +112,79 @@ class BookMain extends React.Component{
         authors:'Mark Twain',
         id:7
       },
-    ],
-  };
+    ];
+    this.state={
+      readingList:this.bookList.filter(function (val) {
+        return (val.states=='reading') ? true : false;
+      }),
+      toReadList:this.bookList.filter(function (val) {
+        return (val.states=='toRead') ? true : false;
+      }),
+      readList:this.bookList.filter(function (val) {
+        return (val.states=='read') ? true : false;
+      })
+    };
+    this.moveBook=this.moveBook.bind(this);
+  }
   componentDidMount(){
     let self=this;
   }
   moveBook(val,toState){
     let self=this;
     let curremtBookIndex;
-    this.state.bookList.forEach(function (value,index) {
+    this.bookList.forEach(function (value,index) {
       if (val.id===value.id){
         curremtBookIndex=index;
       }
     });
-    // let  newBookList;
     switch (toState){
       case "currentlyReading":
-        console.log("currentlyReading");
+        this.bookList[curremtBookIndex].states="reading";
         this.setState(function (prevState,props) {
-          prevState.bookList[curremtBookIndex].states="reading";
-          let  newBookList=prevState.bookList.filter(()=>true)
           return {
-            bookList: newBookList
+            readingList:this.bookList.filter(function (val) {
+              return (val.states=='reading') ? true : false;
+            }),
+            toReadList:this.bookList.filter(function (val) {
+              return (val.states=='toRead') ? true : false;
+            }),
+            readList:this.bookList.filter(function (val) {
+              return (val.states=='read') ? true : false;
+            })
           };
         });
         break;
       case "wantToRead":
-        console.log("wantToRead");
+        this.bookList[curremtBookIndex].states="toRead";
         this.setState(function (prevState,props) {
-          prevState.bookList[curremtBookIndex].states="toRead";
-          let  newBookList=prevState.bookList.filter(()=>true)
           return {
-            bookList: newBookList
+            readingList:this.bookList.filter(function (val) {
+              return (val.states=='reading') ? true : false;
+            }),
+            toReadList:this.bookList.filter(function (val) {
+              return (val.states=='toRead') ? true : false;
+            }),
+            readList:this.bookList.filter(function (val) {
+              return (val.states=='read') ? true : false;
+            })
           };
         });
-        // this.state.bookList[curremtBookIndex].states="wantToRead";
-        // newBookList=this.state.bookList.filter(()=>true);//复制新的数组
-        // this.setState({
-        //   bookList:newBookList
-        // });
         break;
       case "read":
-        console.log("read");
+        this.bookList[curremtBookIndex].states="read";
         this.setState(function (prevState,props) {
-          prevState.bookList[curremtBookIndex].states="read";
-          let  newBookList=prevState.bookList.filter(()=>true)
           return {
-            bookList: newBookList
+            readingList:this.bookList.filter(function (val) {
+              return (val.states=='reading') ? true : false;
+            }),
+            toReadList:this.bookList.filter(function (val) {
+              return (val.states=='toRead') ? true : false;
+            }),
+            readList:this.bookList.filter(function (val) {
+              return (val.states=='read') ? true : false;
+            })
           };
         });
-        // this.state.bookList[curremtBookIndex].states="read";
-        // newBookList=this.state.bookList.filter(()=>true);//复制新的数组
-        // this.setState({
-        //   bookList:newBookList
-        // });
         break;
       default:break;
     }
@@ -180,25 +200,19 @@ class BookMain extends React.Component{
             <div className="bookshelf">
               <h2 className="bookshelf-title">Currently Reading</h2>
               <div className="bookshelf-books">
-                <BookList index="currentlyReading" bookReading= {this.state.bookList.filter(function (val) {
-                  return (val.states=='reading') ? true : false;
-                })} moveBook={this.moveBook.bind(this)} />
+                <BookList index="currentlyReading" bookReading= {this.state.readingList} moveBook={this.moveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Want to Read</h2>
               <div className="bookshelf-books">
-                <BookList index="wantToRead" bookReading= {this.state.bookList.filter(function (val) {
-                   return (val.states=='toRead') ? true : false;
-                })} moveBook={this.moveBook.bind(this)} />
+                <BookList index="wantToRead" bookReading= {this.state.toReadList} moveBook={this.moveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Read</h2>
               <div className="bookshelf-books">
-                <BookList index="read" bookReading= {this.state.bookList.filter(function (val) {
-                  return (val.states=='read') ? true:false;
-                })} moveBook={this.moveBook.bind(this)} />
+                <BookList index="read" bookReading= {this.state.readList} moveBook={this.moveBook} />
               </div>
             </div>
           </div>
@@ -211,26 +225,107 @@ class BookMain extends React.Component{
   }
 }
 class Search extends React.Component{
+  constructor(props){
+    super(props);
+    this.bookList=[
+      {
+        url:'url("http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api")',
+        states:'reading',
+        title:'To Kill a Mockingbird',
+        authors:'Harper Lee',
+        id:1
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=yDtCuFHXbAYC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72RRiTR6U5OUg3IY_LpHTL2NztVWAuZYNFE8dUuC0VlYabeyegLzpAnDPeWxE6RHi0C2ehrR9Gv20LH2dtjpbcUcs8YnH5VCCAH0Y2ICaKOTvrZTCObQbsfp4UbDqQyGISCZfGN&source=gbs_api")',
+        states:'reading',
+        title:'Ender\'s Game',
+        authors:'Orson Scott Card',
+        id:2
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=uu1mC6zWNTwC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73pGHfBNSsJG9Y8kRBpmLUft9O4BfItHioHolWNKOdLavw-SLcXADy3CPAfJ0_qMb18RmCa7Ds1cTdpM3dxAGJs8zfCfm8c6ggBIjzKT7XR5FIB53HHOhnsT7a0Cc-PpneWq9zX&source=gbs_api")',
+        states:'toRead',
+        title:'1776',
+        authors:'David McCullough',
+        id:3
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=wrOQLV6xB-wC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72G3gA5A-Ka8XjOZGDFLAoUeMQBqZ9y-LCspZ2dzJTugcOcJ4C7FP0tDA8s1h9f480ISXuvYhA_ZpdvRArUL-mZyD4WW7CHyEqHYq9D3kGnrZCNiqxSRhry8TiFDCMWP61ujflB&source=gbs_api")',
+        states:'toRead',
+        title:'Harry Potter and the Sorcerer\'s Stone',
+        authors:'J.K. Rowling',
+        id:4
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=pD6arNyKyi8C&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE70Rw0CCwNZh0SsYpQTkMbvz23npqWeUoJvVbi_gXla2m2ie_ReMWPl0xoU8Quy9fk0Zhb3szmwe8cTe4k7DAbfQ45FEzr9T7Lk0XhVpEPBvwUAztOBJ6Y0QPZylo4VbB7K5iRSk&source=gbs_api")',
+        states:'read',
+        title:'The Hobbit',
+        authors:'J.R.R. Tolkien',
+        id:5
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=1q_xAwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE712CA0cBYP8VKbEcIVEuFJRdX1k30rjLM29Y-dw_qU1urEZ2cQ42La3Jkw6KmzMmXIoLTr50SWTpw6VOGq1leINsnTdLc_S5a5sn9Hao2t5YT7Ax1RqtQDiPNHIyXP46Rrw3aL8&source=gbs_api")',
+        states:'read',
+        title:'Oh, the Places You\'ll Go!',
+        authors:'Seuss',
+        id:6
+      },
+      {
+        url:'url("http://books.google.com/books/content?id=32haAAAAMAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72yckZ5f5bDFVIf7BGPbjA0KYYtlQ__nWB-hI_YZmZ-fScYwFy4O_fWOcPwf-pgv3pPQNJP_sT5J_xOUciD8WaKmevh1rUR-1jk7g1aCD_KeJaOpjVu0cm_11BBIUXdxbFkVMdi&source=gbs_api")',
+        states:'read',
+        title:'The Adventures of Tom Sawyer',
+        authors:'Mark Twain',
+        id:7
+      },
+    ]
+    this.state={
+      bookListSearch:[],
+      value:''
+    }
+    this.handChange=this.handChange.bind(this);
+    this.moveBook = this.moveBook.bind(this);
+  }
+  moveBook(val,toState){
+
+  }
+  handChange(e){
+    let value=e.target.value;
+    let newBookList=this.bookList.filter(function (val) {
+      if(value.toString().length<1){
+        return false;
+      }
+      else if(val.title.toLowerCase().indexOf(value.toString().toLowerCase()) >-1 || val.authors.toLowerCase().indexOf(value.toString().toLowerCase())>-1){
+        return true;
+      }else {
+        return false;
+      }
+    });
+    this.setState(function (prevState,props) {
+      return {
+        bookListSearch:newBookList,
+        value:value
+      }
+    })
+  }
   render(){
+
+    let domLi=[];
+    let self=this;
+    this.state.bookListSearch.forEach(function (val,index) {
+      domLi.push(<li key={val.id}> <BookInfor book={val} moveBook={self.state.moveBook}/>  </li>)
+    });
     return(
       <div className="search-books">
         <div className="search-books-bar">
-          {/*<a className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</a>*/}
           <Link className="close-search" to="/"></Link>
           <div className="search-books-input-wrapper">
-            {/*
-             NOTES: The search from BooksAPI is limited to a particular set of search terms.
-             You can find these search terms here:
-             https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-             However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-             you don't find a specific author or title. Every search is limited by search terms.
-             */}
-            <input type="text" placeholder="Search by title or author"/>
+            <input type="text" placeholder="Search by title or author" value={this.state.value} onChange={this.handChange}/>
           </div>
         </div>
         <div className="search-books-results">
-          <ol className="books-grid"></ol>
+          <ol className="books-grid">
+            {domLi}
+          </ol>
         </div>
       </div>
     );
