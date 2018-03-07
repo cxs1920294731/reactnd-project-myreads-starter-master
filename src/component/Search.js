@@ -25,25 +25,34 @@ class Search extends React.Component{
     BooksAPI.update(val,toState);
   }
   handChange(e){
-
     let value=e.target.value;
     console.log(value);
     let self=this;
     if (value.toString().length>0){
       BooksAPI.search(value).then((data)=>{
-        let newData=data.filter(function (val) {
-          if (val.authors && val.imageLinks && val.imageLinks.smallThumbnail && val.title){
-            return true;
-          }else {
-            return false;
-          }
-        })
-        self.setState(function (prevState,props) {
-          return {
-            bookListSearch:newData,
-            value:value
-          }
-        })
+        console.log(data);
+        if(Array.isArray(data)){
+          let newData=data.map(function (val) {
+            val.authors = (val.authors) ? val.authors :'';
+            val.imageLinks =(val.authors) ? val.imageLinks : {};
+            val.imageLinks.smallThumbnail =(val.imageLinks.smallThumbnail) ?val.imageLinks.smallThumbnail:'';
+            val.title=(val.title) ? val.title:'';
+            return val;
+          })
+          self.setState(function (prevState,props) {
+            return {
+              bookListSearch:newData,
+              value:value
+            }
+          })
+        }else {
+          self.setState(function (prevState,props) {
+            return {
+              bookListSearch:[],
+              value:value
+            }
+          })
+        };
       })
     }else {
       self.setState(function (prevState,props) {

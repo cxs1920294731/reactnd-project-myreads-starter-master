@@ -17,6 +17,7 @@ class BookMain extends React.Component{
     this.moveBook=this.moveBook.bind(this);
   }
   componentDidMount(){
+    console.log(this.props.name);
     let self= this;
     self.bookListGet=[];
     BooksAPI.getAll().then((bookList)=>{
