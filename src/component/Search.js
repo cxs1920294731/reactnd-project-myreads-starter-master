@@ -30,9 +30,17 @@ class Search extends React.Component{
     if (value.toString().length>0){
       BooksAPI.search(value).then((data)=>{
         console.log(data)
+        
+        let newData=data.filter(function (val) {
+          if (val.authors && val.imageLinks && val.imageLinks.smallThumbnail && val.title){
+            return true;
+          }else {
+            return false;
+          }
+        })
         self.setState(function (prevState,props) {
           return {
-            bookListSearch:data,
+            bookListSearch:newData,
             value:value
           }
         })
