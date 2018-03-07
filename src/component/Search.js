@@ -4,7 +4,7 @@
 import React from 'react'
 import BookInfor from './BookInfor'
 import {Link} from 'react-router-dom'
-import * as SessionApi from './../sessionStorageApi'
+import { Debounce } from 'react-throttle'
 import * as BooksAPI from './../BooksAPI'
 class Search extends React.Component{
   constructor(props){
@@ -25,12 +25,12 @@ class Search extends React.Component{
     BooksAPI.update(val,toState);
   }
   handChange(e){
+
     let value=e.target.value;
+    console.log(value);
     let self=this;
     if (value.toString().length>0){
       BooksAPI.search(value).then((data)=>{
-        console.log(data)
-        
         let newData=data.filter(function (val) {
           if (val.authors && val.imageLinks && val.imageLinks.smallThumbnail && val.title){
             return true;
@@ -66,7 +66,9 @@ class Search extends React.Component{
         <div className="search-books-bar">
           <Link className="close-search" to="/"></Link>
           <div className="search-books-input-wrapper">
-            <input type="text" placeholder="Search by title or author" value={this.state.value} onChange={this.handChange}/>
+            <Debounce time="400" handler="onChange">
+              <input type="text" placeholder="Search by title or author"  onChange={this.handChange}/>
+            </Debounce>
           </div>
         </div>
         <div className="search-books-results">
