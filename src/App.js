@@ -11,22 +11,19 @@ class BooksApp extends React.Component {
     this.state={
       booklist:[]
     };
-    this.moveBook = this.moveBook.bind(this);
-  }
-  componentDidMount(){
     BooksAPI.getAll().then((data)=>{
       let self=this;
-      console.log(data)
       self.setState({
         booklist:data
       })
-    })
+    });
+    this.moveBook = this.moveBook.bind(this);
+  }
+  componentDidMount(){
   }
   moveBook(book,toState){
     let self=this;
     BooksAPI.update(book,toState).then((bookIDList)=>{
-      console.log(bookIDList);
-
       self.setState({
         booklist:self.state.booklist.map((value)=>{
           if(bookIDList.currentlyReading.indexOf(value.id)>-1){
