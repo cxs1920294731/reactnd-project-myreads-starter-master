@@ -14,9 +14,9 @@ class BookMain extends React.Component{
       toReadList:[],
       readList:[]
     };
-    this.moveBook=this.moveBook.bind(this);
   }
   componentDidMount(){
+   /* console.log(this.props.name);
     let self= this;
     self.bookListGet=[];
     BooksAPI.getAll().then((bookList)=>{
@@ -32,23 +32,7 @@ class BookMain extends React.Component{
           return (val.shelf=='read') ? true : false;
         })
       })
-    })
-  }
-  moveBook(val,toState){
-    let self=this;
-    BooksAPI.update(val,toState).then((bookIDList)=>{
-      self.setState({
-        readingList:self.bookListGet.filter(function (value) {
-          return (bookIDList.currentlyReading.indexOf(value.id)>-1) ? true : false;
-        }),
-        toReadList:self.bookListGet.filter(function (value) {
-          return (bookIDList.wantToRead.indexOf(value.id)>-1) ? true : false;
-        }),
-        readList:self.bookListGet.filter(function (value) {
-          return (bookIDList.read.indexOf(value.id)>-1) ? true : false;
-        })
-      })
-    });
+    })*/
   }
   render(){
     return(
@@ -61,19 +45,24 @@ class BookMain extends React.Component{
             <div className="bookshelf">
               <h2 className="bookshelf-title">Currently Reading</h2>
               <div className="bookshelf-books">
-                <BookList index="currentlyReading" bookReading= {this.state.readingList} moveBook={this.moveBook} />
+                <BookList index="currentlyReading" bookReading= {this.props.bookList.filter(function (val) {
+                  return (val.shelf=='currentlyReading') ? true : false;})} moveBook={this.props.moveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Want to Read</h2>
               <div className="bookshelf-books">
-                <BookList index="wantToRead" bookReading= {this.state.toReadList} moveBook={this.moveBook} />
+                <BookList index="wantToRead" bookReading= {this.props.bookList.filter(function (val) {
+                  return (val.shelf=='wantToRead') ? true : false;
+                })} moveBook={this.props.moveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Read</h2>
               <div className="bookshelf-books">
-                <BookList index="read" bookReading= {this.state.readList} moveBook={this.moveBook} />
+                <BookList index="read" bookReading= {this.props.bookList.filter(function (val) {
+                  return (val.shelf=='read') ? true : false;
+                })} moveBook={this.props.moveBook} />
               </div>
             </div>
           </div>

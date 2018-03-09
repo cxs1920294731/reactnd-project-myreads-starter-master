@@ -4,4 +4,3 @@
 
 ###文件说明
 1. App.js:项目的组件
-2. sessionStroaheApi：封装了一些操作sessionStorage的方法

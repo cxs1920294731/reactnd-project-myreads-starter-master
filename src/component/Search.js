@@ -4,7 +4,7 @@
 import React from 'react'
 import BookInfor from './BookInfor'
 import {Link} from 'react-router-dom'
-import * as SessionApi from './../sessionStorageApi'
+import { Debounce } from 'react-throttle'
 import * as BooksAPI from './../BooksAPI'
 class Search extends React.Component{
   constructor(props){
@@ -14,37 +14,49 @@ class Search extends React.Component{
       value:''
     }
     this.handChange=this.handChange.bind(this);
-    this.moveBook = this.moveBook.bind(this);
+    this.newbookList=this.props.bookList;
   }
   componentDidMount(){
     //this.bookList= SessionApi.getSessionStorage();
 
-  }
-  moveBook(val,toState){
-    let self=this;
-    BooksAPI.update(val,toState);
   }
   handChange(e){
     let value=e.target.value;
     let self=this;
     if (value.toString().length>0){
       BooksAPI.search(value).then((data)=>{
-        console.log(data)
-        
-        let newData=data.filter(function (val) {
-          if (val.authors && val.imageLinks && val.imageLinks.smallThumbnail && val.title){
-            return true;
-          }else {
-            return false;
-          }
-        })
-        self.setState(function (prevState,props) {
-          return {
-            bookListSearch:newData,
-            value:value
-          }
-        })
-      })
+        console.log(self.newbookList);
+        if(Array.isArray(data)){
+          let newData=data.map(function (val) {
+            val.authors = (val.authors) ? val.authors :'';
+            val.imageLinks =(val.authors) ? val.imageLinks : {};
+            val.imageLinks.smallThumbnail =(val.imageLinks.smallThumbnail) ?val.imageLinks.smallThumbnail:'';
+            val.title=(val.title) ? val.title:'';
+            for(let book of self.newbookList){
+              if(book.id == val.id){
+                val.shelf=book.shelf;
+                break;
+              }else {
+                val.shelf='none'
+              }
+            }
+            return val;
+          })
+          self.setState(function (prevState,props) {
+            return {
+              bookListSearch:newData,
+              value:value
+            }
+          })
+        }else {
+          self.setState(function (prevState,props) {
+            return {
+              bookListSearch:[],
+              value:value
+            }
+          })
+        };
+      }).then(()=>console.log(self.state.bookListSearch));
     }else {
       self.setState(function (prevState,props) {
         return {
@@ -53,20 +65,21 @@ class Search extends React.Component{
         }
       })
     }
-
   }
   render(){
     let domLi=[];
     let self=this;
     this.state.bookListSearch.forEach(function (val,index) {
-      domLi.push(<li key={val.id}> <BookInfor book={val} moveBook={self.moveBook}/>  </li>)
+      domLi.push(<li key={val.id}> <BookInfor book={val} moveBook={self.props.moveBook}/>  </li>)
     });
     return(
       <div className="search-books">
         <div className="search-books-bar">
           <Link className="close-search" to="/"></Link>
           <div className="search-books-input-wrapper">
-            <input type="text" placeholder="Search by title or author" value={this.state.value} onChange={this.handChange}/>
+            <Debounce time="400" handler="onChange">
+              <input type="text" placeholder="Search by title or author"  onChange={this.handChange}/>
+            </Debounce>
           </div>
         </div>
         <div className="search-books-results">
