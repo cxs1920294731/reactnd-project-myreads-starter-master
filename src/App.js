@@ -25,21 +25,70 @@ class BooksApp extends React.Component {
   moveBook(book,toState){
     let self=this;
     BooksAPI.update(book,toState).then((bookIDList)=>{
-
-        //let bookID;
-      //现在的问题是怎么找到那个多余的id
-      self.setState({
-        booklist:self.state.booklist.map((value)=>{
-          if(bookIDList.currentlyReading.indexOf(value.id)>-1){
-             value.shelf='currentlyReading';
-          }else if(bookIDList.wantToRead.indexOf(value.id)>-1){
-            value.shelf='wantToRead';
-          }else  if(bookIDList.read.indexOf(value.id)>-1){
-            value.shelf='read';
-          }
-          return value;
+      //如果toState为空
+      let newBookList=[];
+      if(toState =='none'){
+        newBookList=self.state.booklist.filter(function (val,index) {
+          return (val.id==book.id) ? false : true;
+        });
+        self.setState({
+          booklist:newBookList
         })
-      })
+      }else{
+        let bookListIDArr=[],isSearch=true;
+        self.state.booklist.forEach(function (val) {
+          bookListIDArr.push(val.id);
+        });
+        bookIDList.currentlyReading.forEach((val)=>{
+            if (bookListIDArr.indexOf(val)<0 && isSearch){
+              isSearch=false;
+              BooksAPI.get(val).then((book)=>{
+                console.log(book);
+                self.setState({
+                  booklist:self.state.booklist.concat(book)
+                });
+                console.log(self.state.booklist);
+              });
+            }
+        });
+        bookIDList.wantToRead.forEach((val)=>{
+          if (bookListIDArr.indexOf(val)<0 && isSearch){
+            isSearch=false;
+            BooksAPI.get(val).then((book)=>{
+              console.log(book);
+              self.setState({
+                booklist:self.state.booklist.concat(book)
+              })
+            })
+          }
+        });
+        bookIDList.read.forEach((val)=>{
+          if (bookListIDArr.indexOf(val)<0&& isSearch){
+            isSearch=false;
+            BooksAPI.get(val).then((book)=>{
+              self.setState({
+                booklist:self.state.booklist.concat(book)
+              })
+            })
+          }
+        });
+        if (isSearch){
+          newBookList=self.state.booklist.map((value)=>{
+            if(bookIDList.currentlyReading.indexOf(value.id)>-1){
+              value.shelf='currentlyReading';
+            }else if(bookIDList.wantToRead.indexOf(value.id)>-1){
+              value.shelf='wantToRead';
+            }else  if(bookIDList.read.indexOf(value.id)>-1){
+              value.shelf='read';
+            }
+            return value;
+          })
+          self.setState({
+            booklist:newBookList
+          });
+        }
+
+      }
     });
   }
   render() {

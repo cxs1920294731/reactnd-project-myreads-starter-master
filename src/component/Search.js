@@ -30,7 +30,7 @@ class Search extends React.Component{
           let newData=data.map(function (val) {
             val.authors = (val.authors) ? val.authors :'';
             val.imageLinks =(val.authors) ? val.imageLinks : {};
-            val.imageLinks.smallThumbnail =(val.imageLinks.smallThumbnail) ?val.imageLinks.smallThumbnail:'';
+            val.imageLinks.smallThumbnail =(val.imageLinks.smallThumbnail) ? val.imageLinks.smallThumbnail:'';
             val.title=(val.title) ? val.title:'';
             for(let book of self.newbookList){
               if(book.id == val.id){
