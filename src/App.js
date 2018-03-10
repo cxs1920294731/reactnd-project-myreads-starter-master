@@ -11,19 +11,23 @@ class BooksApp extends React.Component {
     this.state={
       booklist:[]
     };
-    BooksAPI.getAll().then((data)=>{
-      let self=this;
-      self.setState({
-        booklist:data
-      })
-    });
+
     this.moveBook = this.moveBook.bind(this);
   }
   componentDidMount(){
+      BooksAPI.getAll().then((data)=>{
+          let self=this;
+          self.setState({
+              booklist:data
+          })
+      });
   }
   moveBook(book,toState){
     let self=this;
     BooksAPI.update(book,toState).then((bookIDList)=>{
+
+        //let bookID;
+      //现在的问题是怎么找到那个多余的id
       self.setState({
         booklist:self.state.booklist.map((value)=>{
           if(bookIDList.currentlyReading.indexOf(value.id)>-1){
